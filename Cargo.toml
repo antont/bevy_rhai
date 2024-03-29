@@ -1,0 +1,12 @@
+[package]
+name = "bevy_rhai"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.13.1"
+bevy_script_api = "0.5.0"
+bevy_mod_scripting = "0.5.0"
+bevy_mod_scripting_rhai = "0.5.0"
