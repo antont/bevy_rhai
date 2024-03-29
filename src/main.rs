@@ -51,7 +51,7 @@ fn main() -> std::io::Result<()> {
         // pick and register only the hosts you want to use
         // use any system set AFTER any systems which add/remove/modify script components
         // in order for your script updates to propagate in a single frame
-        //.add_script_host::<RhaiScriptHost<MyRhaiArgStruct>>(PostUpdate)
+        .add_script_host::<RhaiScriptHost<MyRhaiArgStruct>>(PostUpdate)
 
         // the handlers should be ran after any systems which produce script events.
         // The PostUpdate set is okay only if your API doesn't require the core Bevy systems' commands
@@ -59,7 +59,7 @@ fn main() -> std::io::Result<()> {
         // Note, this setup assumes a single script handler system set with all events having identical
         // priority of zero (see examples for more complex scenarios)
         // .add_script_handler::<RhaiScriptHost<RhaiEventArgs>, 0, 0>(
-        //     PostUpdate,
+        //      PostUpdate,
         // )
 
         // generate events for scripts to pickup
