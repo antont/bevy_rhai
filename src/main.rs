@@ -1,24 +1,33 @@
-use bevy::{ecs::event::Events, prelude::*};
+use bevy::{
+    app::App, 
+    ecs::event::Events, 
+    prelude::*,
+    window::{PrimaryWindow, WindowResized}
+};
 use bevy_console::{AddConsoleCommand, ConsoleCommand, ConsolePlugin, PrintConsoleLine};
-use bevy_mod_scripting::prelude::*;
+use bevy_mod_scripting_core::{event::ScriptErrorEvent, events::PriorityEventWriter, hosts::{Recipients, Script, ScriptCollection}, ScriptingPlugin};
+use bevy_mod_scripting_rhai::{
+    assets::RhaiFile,
+    rhai::{self, FuncArgs}, 
+    RhaiContext, 
+    RhaiEvent, 
+    RhaiScriptHost
+};
 use bevy_script_api::common::bevy::ScriptWorld;
 use clap::Parser;
 
-use bevy::{
-    app::App, window::{PrimaryWindow, WindowResized}
-};
+//use bevy::app::AppExit;
+//use bevy_mod_scripting_rhai
+//use bevy_mod_scripting_rhai::rhai::Engine;
+//use bevy_script_api::rhai::{std::RegisterVecType, RegisterForeignRhaiType};
 
 #[derive(Clone)]
 pub struct MyRhaiArgStruct {
     // ...
 }
 
-use bevy_mod_scripting_rhai::{
-    assets::RhaiFile, rhai::{self, FuncArgs}, RhaiContext, RhaiEvent, RhaiScriptHost
-};
 //use bevy_mod_scripting_rhai::rhai::packages::Package;
 //use bevy_script_api::rhai::{std::RegisterVecType, RegisterForeignRhaiType};
-
 
 impl FuncArgs for MyRhaiArgStruct {
     fn parse<ARGS: Extend<rhai::Dynamic>>(self, _args: &mut ARGS) {
@@ -113,12 +122,12 @@ fn main() -> std::io::Result<()> {
         .add_console_command::<RunScriptCmd, _>(run_script_cmd)
         //.add_console_command::<DeleteScriptCmd, _>(delete_script_cmd)
         // choose and register the script hosts you want to use
-        .add_script_host::<RhaiScriptHost<()>>(PostUpdate)
+        //.add_script_host::<RhaiScriptHost<()>>(PostUpdate)
         // .add_api_provider::<RhaiScriptHost<()>>(Box::new(RhaiAPI))
-        // .add_api_provider::<RhaiScriptHost<()>>(Box::new(RhaiBevyAPIProvider))
-        .add_script_handler::<RhaiScriptHost<()>, 0, 0>(PostUpdate)
+        //.add_api_provider::<RhaiScriptHost<()>>(Box::new(RhaiBevyAPIProvider))
+        //.add_script_handler::<RhaiScriptHost<()>, 0, 0>(PostUpdate)
         // add your systems
-        .add_systems(Update, trigger_on_update_rhai)
+        //.add_systems(Update, trigger_on_update_rhai)
         .add_systems(Update, forward_script_err_to_console);
     // generate events for scripts to pickup
     //.add_systems(Update, trigger_on_update_rhai)

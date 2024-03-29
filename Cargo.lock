@@ -1050,6 +1050,7 @@ dependencies = [
  "bevy",
  "bevy_console",
  "bevy_mod_scripting",
+ "bevy_mod_scripting_core",
  "bevy_mod_scripting_rhai",
  "bevy_script_api",
  "clap",
