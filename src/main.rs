@@ -12,7 +12,7 @@ pub struct MyRhaiArgStruct {
 
 use bevy_mod_scripting::prelude::*;
 use bevy_mod_scripting_rhai::{
-    assets::RhaiFile, rhai::{self, FuncArgs}, RhaiEvent, RhaiScriptHost
+    assets::RhaiFile, rhai::{self, FuncArgs}, RhaiContext, RhaiEvent, RhaiScriptHost
 };
 //use bevy_mod_scripting_rhai::rhai::packages::Package;
 //use bevy_script_api::rhai::{std::RegisterVecType, RegisterForeignRhaiType};
@@ -117,22 +117,21 @@ fn main() -> std::io::Result<()> {
         // use any system set AFTER any systems which add/remove/modify script components
         // in order for your script updates to propagate in a single frame
         .add_script_host::<RhaiScriptHost<MyRhaiArgStruct>>(PostUpdate)
-
+        .add_systems(Startup, run_script_cmd)
         // the handlers should be ran after any systems which produce script events.
         // The PostUpdate set is okay only if your API doesn't require the core Bevy systems' commands
         // to run beforehand.
         // Note, this setup assumes a single script handler system set with all events having identical
         // priority of zero (see examples for more complex scenarios)
-        // .add_script_handler::<RhaiScriptHost<RhaiEventArgs>, 0, 0>(
-        //      PostUpdate,
-        // )
+        .add_script_handler::<RhaiScriptHost<MyRhaiArgStruct>, 0, 0>(
+             PostUpdate,
+        );
 
         // generate events for scripts to pickup
         //.add_systems(Update, trigger_on_update_rhai)
 
         // attach script components to entities
         
-        .add_systems(Startup, run_script_cmd);
     app.run();
 
     Ok(())
