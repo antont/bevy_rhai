@@ -125,7 +125,7 @@ fn main() -> std::io::Result<()> {
 
     // attach script components to entities
         
-    info!("press '~' to open the console. Type in `run_script \"console_integration.rhai\"` to run example script!");
+    info!("press '~' to open the console. Type in `run_script \"run.rhai\"` to run example script!");
 
     app.run();
 
