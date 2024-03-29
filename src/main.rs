@@ -59,6 +59,7 @@ pub fn run_script_cmd(
     mut log: ConsoleCommand<RunScriptCmd>,
     server: Res<AssetServer>,
     mut commands: Commands,
+    script_host: Res<RhaiScriptHost<MyRhaiArgStruct>>,
     mut existing_scripts: Query<&mut ScriptCollection<RhaiFile>>,
 ) {
     let path = "run.rhai".to_string();
@@ -82,10 +83,54 @@ pub fn run_script_cmd(
         //     None => {
         info!("Creating script: scripts/{}", &path);
 
-        commands.spawn(()).insert(ScriptCollection::<RhaiFile> {
-            scripts: vec![Script::<RhaiFile>::new(path, handle)],
-        });
+        //let script = Script::<RhaiFile>::new(path.clone(), handle.clone());
+        let script = Script::<RhaiFile>::new(path, handle);
+        let script_entity = commands.spawn(()).insert(ScriptCollection::<RhaiFile> {
+            scripts: vec![script],
+        }).id();
+
+        println!("{:?}", existing_scripts);
+
+        // Load the script
+        let handle = server.load::<RhaiFile>(&format!("scripts/{}", &path));
+        if let Some(handle) = server.get_handle::<RhaiFile>(&handle) {
+            let script_content = handle.get().unwrap();
+            let result = script_host.run_one_shot(
+                script_content,
+                "test",
+                script_entity,
+                script_entity,
+                null
+            );
+
+            // Handle the result
+            match result {
+                Ok(_) => println!("Script ran successfully"),
+                Err(e) => println!("Error running script: {:?}", e),
+            }
+        } else {
+            println!("Error loading script: Handle does not exist");
+        }
+            // match existing_scripts.get(script_entity) {
+        //     Ok(script) => {
+        //         // Run the script
+        //         let script_content = script.load().unwrap().bytes;
+        //         let result = script_host.run_one_shot(
+        //             script_content,
+        //             "test",
+        //             script_entity,
+        //             script_entity,
+        //             null
+        //         );
+
+        //         // Handle the result
+        //         match result {
+        //             Ok(_) => println!("Script ran successfully"),
+        //             Err(e) => println!("Error running script: {:?}", e),
+        //         }
         //     }
+        //     Err(e) => println!("Error getting script: {:?}", e),
+        // }        //     }
         // };
     }
 }
