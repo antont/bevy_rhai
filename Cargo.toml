@@ -11,3 +11,4 @@ bevy_script_api = "0.5.0"
 bevy_mod_scripting = "0.5.0"
 bevy_mod_scripting_rhai = "0.5.0"
 bevy_console = "0.11.1"
+clap = { version = "4.1", features = ["derive"] }

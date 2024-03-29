@@ -1052,6 +1052,7 @@ dependencies = [
  "bevy_mod_scripting",
  "bevy_mod_scripting_rhai",
  "bevy_script_api",
+ "clap",
 ]
 
 [[package]]

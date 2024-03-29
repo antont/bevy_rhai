@@ -1,13 +1,15 @@
 use bevy::{
     app::App, prelude::*, window::{PrimaryWindow, WindowResized}
 };
+use bevy_console::{
+    clap::Parser, AddConsoleCommand, ConsoleCommand, ConsolePlugin, PrintConsoleLine, ConsoleCommandEntered
+};
 
 #[derive(Clone)]
 pub struct MyRhaiArgStruct {
     // ...
 }
 
-use bevy_console::ConsoleCommand;
 use bevy_mod_scripting::prelude::*;
 use bevy_mod_scripting_rhai::{
     assets::RhaiFile, rhai::{self, FuncArgs}, RhaiEvent, RhaiScriptHost
@@ -43,9 +45,8 @@ pub fn trigger_on_update_rhai(mut w: PriorityEventWriter<RhaiEvent<()>>) {
 //     }
 // }
 
-// #[derive(Parser, ConsoleCommand)]
-// #[command(name = "run_script")]
-///Runs a Lua script from the `assets/scripts` directory
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "run_script")]
 pub struct RunScriptCmd {
     /// the relative path to the script, e.g.: `/hello.lua` for a script located in `assets/scripts/hello.lua`
     pub path: String,
@@ -55,7 +56,7 @@ pub struct RunScriptCmd {
 }
 
 pub fn run_script_cmd(
-    //mut log: EventReader<ConsoleCommand<RunScriptCmd>>,
+    mut log: ConsoleCommand<RunScriptCmd>,
     server: Res<AssetServer>,
     mut commands: Commands,
     mut existing_scripts: Query<&mut ScriptCollection<RhaiFile>>,
@@ -63,32 +64,29 @@ pub fn run_script_cmd(
     let path = "run.rhai".to_string();
     let entity = Some(1u32); // replace 1 with your desired entity id
 
-    //if let Some(Ok(RunScriptCmd { path, entity })) = log.take()
-
-    //if let Some(Ok(RunScriptCmd { path, entity })) = Some(Ok(RunScriptCmd { path, entity })) {
-    //let cmd = Some(Ok(RunScriptCmd { path, entity }: RunScriptCmd, E));
-    let cmd = RunScriptCmd { path, entity };
+    //if let Some(Ok(RunScriptCmd { path, entity })) = log.take() {
     if true {
-        let handle = server.load::<RhaiFile>(&format!("scripts/{}", &cmd.path));
+        let handle = server.load::<RhaiFile>(&format!("scripts/{}", &path));    //if let Some(Ok(RunScriptCmd { path, entity })) = log.take() {
+        info!("[run_script_cmd] Processing script: scripts/{}", &path);
 
-        match entity {
-            Some(e) => {
-                if let Ok(mut scripts) = existing_scripts.get_mut(Entity::from_raw(e)) {
-                    info!("Creating script: scripts/{} {:?}", &cmd.path, e);
+        // match entity {
+        //     Some(e) => {
+        //         if let Ok(mut scripts) = existing_scripts.get_mut(Entity::from_raw(e)) {
+        //             info!("Creating script: scripts/{} {:?}", &path, e);
 
-                    scripts.scripts.push(Script::<RhaiFile>::new(cmd.path, handle));
-                } else {
-                    //log.reply_failed("Something went wrong".to_string());
-                };
-            }
-            None => {
-                info!("Creating script: scripts/{}", &cmd.path);
+        //             scripts.scripts.push(Script::<RhaiFile>::new(path, handle));
+        //         } else {
+        //             log.reply_failed("Something went wrong".to_string());
+        //         };
+        //     }
+        //     None => {
+        info!("Creating script: scripts/{}", &path);
 
-                commands.spawn(()).insert(ScriptCollection::<RhaiFile> {
-                    scripts: vec![Script::<RhaiFile>::new(cmd.path, handle)],
-                });
-            }
-        };
+        commands.spawn(()).insert(ScriptCollection::<RhaiFile> {
+            scripts: vec![Script::<RhaiFile>::new(path, handle)],
+        });
+        //     }
+        // };
     }
 }
 
@@ -108,11 +106,13 @@ pub fn run_script_cmd(
 // }
 
 fn main() -> std::io::Result<()> {
-    let runscript_system = IntoSystem::into_system(run_script_cmd);
+    //let runscript_system = IntoSystem::into_system(run_script_cmd);
 
     let mut app = App::new();
         app.add_plugins(ScriptingPlugin)
         .add_plugins(DefaultPlugins)
+        .add_plugins(ConsolePlugin)
+        .add_console_command::<RunScriptCmd, _>(run_script_cmd)
         // pick and register only the hosts you want to use
         // use any system set AFTER any systems which add/remove/modify script components
         // in order for your script updates to propagate in a single frame
@@ -131,7 +131,8 @@ fn main() -> std::io::Result<()> {
         //.add_systems(Update, trigger_on_update_rhai)
 
         // attach script components to entities
-        .add_systems(Startup, runscript_system);
+        
+        .add_systems(Startup, run_script_cmd);
     app.run();
 
     Ok(())
